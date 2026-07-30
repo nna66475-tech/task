@@ -285,3 +285,29 @@ body {
     border: 3px solid #6b6b9c; /* ゲーム風の枠線色（他の枠線と合わせる場合） */
     box-shadow: 2px 2px 0px #000000; /* ドット絵風の影（お好みで） */
 }
+.login-image-container {
+    width: 100%;
+    max-width: 130px;
+    margin: 0 auto 12px auto;
+    text-align: center;
+    
+    /* 下部の余白を削りつつ、内側で切り抜くための設定 */
+    overflow: hidden; 
+    height: 140px; /* 画像の比率に合わせて高さを少し詰める（微調整してください） */
+}
+
+.responsive-home-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 359 / 500;
+    object-fit: contain;
+    image-rendering: pixelated;
+    
+    background-color: #ffffff;
+    padding: 6px;
+    border: 3px solid #6b6b9c;
+    box-shadow: 2px 2px 0px #000000;
+    
+    /* 下側をトリミングするように少し上に引き上げる */
+    transform: translateY(-10px); /* 数値を変えて位置を微調整できます */
+}
