@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - カスタム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="custom.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">カスタム・追加機能</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <main class="main-content">
+            <!-- 設定一覧表示 -->
+            <div class="content-box">
+                <h2 class="sub-title">設定一覧</h2>
+                <ul id="settings-list" class="dot-list">
+                    <li class="setting-item">
+                        <span class="setting-name">テーマカラー設定</span>
+                        <a href="mypage.html" class="dot-btn setting-link-btn">変更する</a>
+                    </li>
+                    <li class="setting-item">
+                        <span class="setting-name">フォント切り替え</span>
+                        <a href="mypage.html" class="dot-btn setting-link-btn">変更する</a>
+                    </li>
+                    <li class="setting-item">
+                        <span class="setting-name">データバックアップ</span>
+                        <span class="setting-badge">準備中</span>
+                    </li>
+                    <li class="setting-item">
+                        <span class="setting-name">通知設定</span>
+                        <span class="setting-badge">準備中</span>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="custom.js"></script>
+</body>
+</html>

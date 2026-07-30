@@ -1,0 +1,38 @@
+/* custom.html 専用スタイル */
+.sub-title {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #ffcc00;
+}
+
+.setting-item {
+    font-size: 12px;
+    padding: 8px;
+    margin-bottom: 6px;
+    background-color: #3b3b5c;
+    border: 2px solid #6b6b9c;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-name {
+    color: #fff;
+}
+
+.setting-link-btn {
+    font-size: 10px;
+    padding: 2px 6px;
+    background-color: var(--accent-color, #00ffcc);
+    color: #000;
+    text-decoration: none;
+    text-align: center;
+}
+
+.setting-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background-color: #2b2b40;
+    color: #a0a0c0;
+    border: 1px solid #6b6b9c;
+}

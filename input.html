@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - インプット</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="input.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">インプット管理</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <!-- タブ切り替え -->
+        <div class="tab-container">
+            <button class="dot-btn tab-btn active" data-target="tab-watched">見た作品</button>
+            <button class="dot-btn tab-btn" data-target="tab-watchlist">見たい作品</button>
+        </div>
+
+        <main class="main-content">
+            <!-- 【見た作品タブ】 -->
+            <section id="tab-watched" class="tab-content">
+                <div class="content-box">
+                    <h2 class="sub-title">感想・評価を記録</h2>
+                    <div class="input-form">
+                        <input type="text" id="watched-title" class="dot-input" placeholder="作品名">
+                        
+                        <div class="star-rating-box">
+                            <label>評価:</label>
+                            <select id="watched-stars" class="dot-input">
+                                <option value="5">★★★★★ (5)</option>
+                                <option value="4">★★★★☆ (4)</option>
+                                <option value="3">★★★☆☆ (3)</option>
+                                <option value="2">★★☆☆☆ (2)</option>
+                                <option value="1">★☆☆☆☆ (1)</option>
+                            </select>
+                        </div>
+
+                        <textarea id="watched-review" class="dot-textarea" placeholder="レビュー・感想"></textarea>
+                        <button id="watched-save-btn" class="dot-btn primary-btn">保存する</button>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <h2 class="sub-title">見た作品一覧</h2>
+                    <ul id="watched-list" class="dot-list">
+                        <!-- JSで動的生成 -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 【見たい作品タブ】 -->
+            <section id="tab-watchlist" class="tab-content hidden">
+                <div class="content-box">
+                    <h2 class="sub-title">気になっている作品を追加</h2>
+                    <div class="input-form">
+                        <input type="text" id="watchlist-title" class="dot-input" placeholder="見たい作品名">
+                        <button id="watchlist-add-btn" class="dot-btn primary-btn">追加する</button>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <h2 class="sub-title">見たい作品一覧</h2>
+                    <ul id="watchlist-list" class="dot-list">
+                        <!-- JSで動的生成 -->
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="input.js"></script>
+</body>
+</html>

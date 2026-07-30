@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - スケジュール</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="schedule.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">スケジュール</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <main class="main-content">
+            <!-- カレンダー操作部 -->
+            <div class="calendar-header-box">
+                <button id="prev-month-btn" class="dot-btn">&lt; 前月</button>
+                <span id="calendar-title" class="calendar-title">2026年 7月</span>
+                <button id="next-month-btn" class="dot-btn">次月 &gt;</button>
+            </div>
+
+            <!-- 月カレンダー表示 -->
+            <div class="content-box calendar-box">
+                <div class="calendar-weekdays">
+                    <span class="sun">日</span>
+                    <span>月</span>
+                    <span>火</span>
+                    <span>水</span>
+                    <span>木</span>
+                    <span>金</span>
+                    <span class="sat">土</span>
+                </div>
+                <div id="calendar-grid" class="calendar-grid">
+                    <!-- JSで動적生成 -->
+                </div>
+            </div>
+
+            <!-- 選択された日の予定詳細表示 -->
+            <div class="content-box">
+                <h2 class="sub-title" id="selected-date-label">日付を選択してください</h2>
+                <ul id="day-schedule-list" class="dot-list">
+                    <li style="font-size:11px; color:#a0a0c0; text-align:center;">タスクの締切や予定がここに表示されます</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="schedule.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* mypage.html 専用スタイル */
+.sub-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #ffcc00;
+}
+
+.desc-text {
+    font-size: 10px;
+    color: #a0a0c0;
+    margin-bottom: 8px;
+}
+
+.setting-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.primary-btn {
+    background-color: var(--accent-color, #00ffcc);
+    color: #000;
+    width: 100%;
+}

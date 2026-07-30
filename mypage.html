@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - マイページ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mypage.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">マイページ設定</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <main class="main-content">
+            <!-- テーマカラー設定 -->
+            <div class="content-box">
+                <h2 class="sub-title">テーマカラー設定</h2>
+                <p class="desc-text">アクセントカラー（ボタンや枠線など）の色をコードで変更できます。</p>
+                <div class="setting-row">
+                    <input type="text" id="color-input" class="dot-input" placeholder="#00ffcc">
+                    <button id="color-save-btn" class="dot-btn primary-btn">適用する</button>
+                </div>
+            </div>
+
+            <!-- フォント切り替え設定 -->
+            <div class="content-box">
+                <h2 class="sub-title">フォント切り替え</h2>
+                <p class="desc-text">アプリ全体のフォントスタイルを変更します。</p>
+                <div class="setting-row">
+                    <select id="font-select" class="dot-input">
+                        <option value="sans-serif">ゴシック体 (標準)</option>
+                        <option value="serif">明朝体</option>
+                        <option value="monospace">等幅フォント (ドット風)</option>
+                    </select>
+                    <button id="font-save-btn" class="dot-btn primary-btn">変更する</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="mypage.js"></script>
+</body>
+</html>

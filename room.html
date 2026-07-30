@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - マイルーム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="room.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">マイルーム</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <!-- タブ切り替え -->
+        <div class="tab-container">
+            <button class="dot-btn tab-btn active" data-target="tab-report">報告</button>
+            <button class="dot-btn tab-btn" data-target="tab-room">部屋</button>
+        </div>
+
+        <main class="main-content">
+            <!-- 【報告タブ】 -->
+            <section id="tab-report" class="tab-content">
+                <div class="content-box">
+                    <p class="report-desc">今日の出来事や頑張ったことを報告しよう！</p>
+                    <textarea id="report-input" class="dot-textarea" placeholder="例：バイト、何もしてない、勉強した、など..."></textarea>
+                    <button id="report-send-btn" class="dot-btn primary-btn">送信する</button>
+                </div>
+
+                <!-- 返答表示エリア -->
+                <div id="response-box" class="content-box response-box hidden">
+                    <p class="response-speaker">🤖 Grow Up Me!</p>
+                    <p id="response-text" class="response-text"></p>
+                </div>
+            </section>
+
+            <!-- 【部屋タブ】 -->
+            <section id="tab-room" class="tab-content hidden">
+                <div class="content-box room-status-box">
+                    <p>部屋レベル: <span id="room-level">1</span></p>
+                </div>
+
+                <div class="content-box">
+                    <h2 class="sub-title">家具一覧（配置）</h2>
+                    <ul id="furniture-list" class="dot-list">
+                        <!-- JSで動的生成 -->
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="room.js"></script>
+</body>
+</html>

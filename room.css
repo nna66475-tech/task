@@ -1,0 +1,90 @@
+/* room.html 専用スタイル */
+.tab-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    font-size: 13px;
+    padding: 8px;
+    background-color: #2b2b40;
+}
+
+.tab-btn.active {
+    background-color: #00ffcc;
+    color: #000;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+.report-desc {
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #a0a0c0;
+}
+
+.primary-btn {
+    width: 100%;
+    background-color: #ff3366;
+    margin-top: 4px;
+}
+
+/* 返答メッセージ枠 */
+.response-box {
+    background-color: #232336;
+    border: 2px dashed #00ffcc;
+    margin-top: 12px;
+}
+
+.response-speaker {
+    font-size: 11px;
+    color: #00ffcc;
+    margin-bottom: 6px;
+}
+
+.response-text {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* 部屋画面 */
+.room-status-box {
+    text-align: center;
+    font-size: 15px;
+    color: #ffcc00;
+    border: 2px solid #ffcc00;
+}
+
+.sub-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #ffcc00;
+}
+
+.furniture-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+}
+
+.furniture-info span {
+    font-size: 12px;
+    display: block;
+    color: #a0a0c0;
+}
+
+.furniture-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+    background-color: #4e4e7c;
+}
+
+.furniture-btn.placed {
+    background-color: #00cc66;
+    color: #000;
+}

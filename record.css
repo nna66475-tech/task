@@ -1,0 +1,62 @@
+/* record.html 専用スタイル */
+.month-selector-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-title {
+    font-size: 14px;
+    color: #ffcc00;
+}
+
+.tab-container {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    font-size: 11px;
+    padding: 6px 2px;
+    background-color: #2b2b40;
+    text-align: center;
+}
+
+.tab-btn.active {
+    background-color: #00ffcc;
+    color: #000;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+.sub-title {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #ffcc00;
+}
+
+.record-item {
+    font-size: 12px;
+    padding: 8px;
+    margin-bottom: 6px;
+    background-color: #3b3b5c;
+    border: 2px solid #6b6b9c;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.record-date {
+    font-size: 10px;
+    color: #00ffcc;
+}
+
+.record-text {
+    color: #fff;
+    word-break: break-all;
+}

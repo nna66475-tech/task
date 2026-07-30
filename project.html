@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - プロジェクト</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="project.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">プロジェクト</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <main class="main-content">
+            <!-- 目標追加フォーム -->
+            <div class="content-box">
+                <h2 class="sub-title">長期目標を追加</h2>
+                <div class="input-form">
+                    <input type="text" id="project-title" class="dot-input" placeholder="目標名（例: 資格取得する）">
+                    <button id="project-add-btn" class="dot-btn primary-btn">追加する</button>
+                </div>
+            </div>
+
+            <!-- 目標一覧表示 -->
+            <div class="content-box">
+                <h2 class="sub-title">プロジェクト一覧</h2>
+                <ul id="project-list" class="dot-list">
+                    <!-- JSで動的生成 -->
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="project.js"></script>
+</body>
+</html>

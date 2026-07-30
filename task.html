@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Up Me! - タスク</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="task.css">
+</head>
+<body>
+    <!-- ローディング画面 -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <p class="loading-title">今日は何する？</p>
+            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div id="app" class="app-container hidden">
+        <header class="header">
+            <h1 class="game-title">タスク管理</h1>
+            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
+        </header>
+
+        <main class="main-content">
+            <!-- タスク追加フォーム -->
+            <div class="content-box">
+                <h2 class="sub-title">新規タスク追加</h2>
+                <div class="task-form">
+                    <input type="text" id="task-title-input" class="dot-input" placeholder="タスク名を入力...">
+                    
+                    <div class="date-input-group">
+                        <label>開始日:</label>
+                        <input type="date" id="task-start-input" class="dot-input">
+                    </div>
+                    
+                    <div class="date-input-group">
+                        <label>締切日:</label>
+                        <input type="date" id="task-due-input" class="dot-input">
+                    </div>
+
+                    <button id="task-add-btn" class="dot-btn primary-btn">追加する</button>
+                </div>
+            </div>
+
+            <!-- タスク一覧表示（期限が近い順） -->
+            <div class="content-box">
+                <h2 class="sub-title">タスク一覧 (期限順)</h2>
+                <ul id="task-list" class="dot-list">
+                    <!-- JSで動的生成 -->
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="task.js"></script>
+</body>
+</html>
