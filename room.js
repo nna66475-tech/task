@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportSendBtn = document.getElementById('report-send-btn');
     const topMsg = document.getElementById('top-msg');
 
-    const repliesNothing = ["大大変。今日はそんな日なんだ医。", "疲れているのか？きちんと休む方がいい。", "小さな事から始めてみようぜ"];
-    const repliesDefault = ["さすがだね、一歩前進だな。", "君のことのように嬉しい。", "君ってやつは天晴だな。", "君の成長の、いつでも追従しているよ。"];
+    const repliesNothing = [ "大丈夫。今日はそういう日だよな。","疲れてるのか？きちんと寝た方がいい。","小さいことから始めてみよう。"];
+    const repliesDefault = ["さすがだな、一歩前進だ。", "自分のことのように嬉しいぞ。", "お前ってやつは天才だな。", "お前の頑張り、いつだって応援している。"];
 
     reportSendBtn.addEventListener('click', () => {
         const text = reportInput.value.trim();
@@ -120,14 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let img = "";
         let topText = "";
 
-        if (text.includes("バグ")) {
+        if (text.includes("バイト")) {
             img = "kutipaku.gif";
             reply = "疲れたんだろ、ゆっくり休め";
             topText = "";
         } else if (text.includes("何もしてない")) {
             img = "kutipaku.gif";
             reply = repliesNothing[Math.floor(Math.random() * repliesNothing.length)];
-            topText = "顔色悪…";
+            topText = "顔色悪いぞ？大丈夫か";
         } else {
             img = "banzai.gif";
             reply = repliesDefault[Math.floor(Math.random() * repliesDefault.length)];
