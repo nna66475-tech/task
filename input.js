@@ -1,9 +1,6 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_WATCHED_KEY = 'grow_up_me_watched';
-    const STORAGE_WATCHLIST_KEY = 'grow_up_me_watchlist';
-    const STORAGE_RECORD_KEY = 'grow_up_me_records';
-    const STORAGE_ROOM_KEY = 'grow_up_me_room';
+// input.js
 
+document.addEventListener('DOMContentLoaded', () => {
     // タブ切り替え
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -19,169 +16,226 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 【見た作品】 ---
-    const watchedTitleInput = document.getElementById('watched-title');
-    const watchedStarsInput = document.getElementById('watched-stars');
-    const watchedReviewInput = document.getElementById('watched-review');
-    const watchedSaveBtn = document.getElementById('watched-save-btn');
-    const watchedListEl = document.getElementById('watched-list');
+    const STORAGE_REVIEWS_KEY = 'grow_up_me_reviews';
+    const STORAGE_WISHLIST_KEY = 'grow_up_me_wishlist';
 
-    let watchedList = JSON.parse(localStorage.getItem(STORAGE_WATCHED_KEY)) || [];
+    // --- 感想機能 ---
+    const reviewTitleInput = document.getElementById('review-title');
+    const reviewStarsSelect = document.getElementById('review-stars');
+    const reviewTextInput = document.getElementById('review-text');
+    const addReviewBtn = document.getElementById('add-review-btn');
+    const reviewListEl = document.getElementById('review-list');
 
-    watchedSaveBtn.addEventListener('click', () => {
-        const title = watchedTitleInput.value.trim();
-        const stars = Number(watchedStarsInput.value);
-        const review = watchedReviewInput.value.trim();
-
-        if (!title) {
-            alert('作品名を入力してください！');
-            return;
-        }
-
-        const newWatched = {
-            id: Date.now(),
-            title: title,
-            stars: stars,
-            review: review
-        };
-
-        watchedList.push(newWatched);
-        localStorage.setItem(STORAGE_WATCHED_KEY, JSON.stringify(watchedList));
-        renderWatched();
-
-        // 記録へも保存
-        saveRecord(`見た作品: ${title} (評価:${'★'.repeat(stars)})`);
-
-        // リセット
-        watchedTitleInput.value = '';
-        watchedReviewInput.value = '';
-        watchedStarsInput.value = '5';
-    });
-
-    function renderWatched() {
-        watchedListEl.innerHTML = '';
-        if (watchedList.length === 0) {
-            watchedListEl.innerHTML = '<li style="text-align:center; font-size:12px; color:#a0a0c0; padding:6px;">記録された作品はありません</li>';
-            return;
-        }
-
-        watchedList.forEach(item => {
-            const li = document.createElement('li');
-            li.className = 'input-item';
-            li.innerHTML = `
-                <div class="item-info">
-                    <span class="item-title">${escapeHtml(item.title)}</span>
-                    <span class="item-stars">${'★'.repeat(item.stars)}${'☆'.repeat(5 - item.stars)}</span>
-                    ${item.review ? `<span class="item-review">${escapeHtml(item.review)}</span>` : ''}
-                </div>
-            `;
-            watchedListEl.appendChild(li);
-        });
+    function getReviews() {
+        return JSON.parse(localStorage.getItem(STORAGE_REVIEWS_KEY)) || [];
     }
 
-    // --- 【見たい作品】 ---
-    const watchlistTitleInput = document.getElementById('watchlist-title');
-    const watchlistAddBtn = document.getElementById('watchlist-add-btn');
-    const watchlistListEl = document.getElementById('watchlist-list');
+    function saveReviews(reviews) {
+        localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(reviews));
+    }
 
-    let watchlist = JSON.parse(localStorage.getItem(STORAGE_WATCHLIST_KEY)) || [];
-
-    watchlistAddBtn.addEventListener('click', () => {
-        const title = watchlistTitleInput.value.trim();
-        if (!title) {
-            alert('作品名を入力してください！');
-            return;
-        }
-
-        const newItem = {
-            id: Date.now(),
-            title: title
-        };
-
-        watchlist.push(newItem);
-        localStorage.setItem(STORAGE_WATCHLIST_KEY, JSON.stringify(watchlist));
-        renderWatchlist();
-
-        watchlistTitleInput.value = '';
-    });
-
-    function renderWatchlist() {
-        watchlistListEl.innerHTML = '';
-        if (watchlist.length === 0) {
-            watchlistListEl.innerHTML = '<li style="text-align:center; font-size:12px; color:#a0a0c0; padding:6px;">見たい作品はありません</li>';
-            return;
-        }
-
-        watchlist.forEach(item => {
+    function renderReviews() {
+        const reviews = getReviews();
+        reviewListEl.innerHTML = '';
+        
+        reviews.forEach(review => {
             const li = document.createElement('li');
-            li.className = 'input-item';
+            li.className = 'review-item';
+            
+            let stars = '';
+            for(let i=0; i<5; i++) {
+                stars += (i < review.stars) ? '★' : '☆';
+            }
+
             li.innerHTML = `
-                <div class="item-info">
-                    <span class="item-title">${escapeHtml(item.title)}</span>
+                <div class="review-header">
+                    <span class="review-title">${review.title}</span>
+                    <span class="review-stars">${stars}</span>
                 </div>
-                <input type="checkbox" class="item-check watchlist-check" data-id="${item.id}" title="完了して記録＆レベルアップ">
+                <div class="review-text">${review.text}</div>
+                <div class="review-actions" style="display:flex; gap:8px; margin-top:8px; justify-content:flex-end;">
+                    <button class="dot-btn edit-review-btn" data-id="${review.id}" style="font-size:12px; padding:4px 8px;">編集</button>
+                    <button class="dot-btn delete-review-btn" data-id="${review.id}" style="font-size:12px; padding:4px 8px; background-color:#ff3366;">削除</button>
+                </div>
             `;
-            watchlistListEl.appendChild(li);
+            reviewListEl.appendChild(li);
         });
 
-        // チェックボックスイベント (削除・記録へ保存・レベル+1)
-        document.querySelectorAll('.watchlist-check').forEach(chk => {
-            chk.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    const itemId = Number(e.target.getAttribute('data-id'));
-                    completeWatchlistItem(itemId);
+        document.querySelectorAll('.delete-review-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if(confirm('本当に削除しますか？')) {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    let reviews = getReviews();
+                    reviews = reviews.filter(r => r.id !== id);
+                    saveReviews(reviews);
+                    renderReviews();
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-review-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                const reviews = getReviews();
+                const review = reviews.find(r => r.id === id);
+                if (review) {
+                    reviewTitleInput.value = review.title;
+                    reviewStarsSelect.value = review.stars;
+                    reviewTextInput.value = review.text;
+                    
+                    addReviewBtn.textContent = '保存する';
+                    addReviewBtn.dataset.editingId = id;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             });
         });
     }
 
-    function completeWatchlistItem(itemId) {
-        const index = watchlist.findIndex(i => i.id === itemId);
-        if (index === -1) return;
+    addReviewBtn.addEventListener('click', () => {
+        const title = reviewTitleInput.value.trim();
+        const stars = parseInt(reviewStarsSelect.value);
+        const text = reviewTextInput.value.trim();
 
-        const completed = watchlist[index];
-
-        // 1. 削除
-        watchlist.splice(index, 1);
-        localStorage.setItem(STORAGE_WATCHLIST_KEY, JSON.stringify(watchlist));
-
-        // 2. 記録へ保存
-        saveRecord(`見たい作品制覇: ${completed.title}`);
-
-        // 3. レベル+1
-        incrementLevel();
-
-        alert(`「${completed.title}」を達成しました！\n記録に保存され、レベルが上がりました！`);
-        renderWatchlist();
-    }
-
-    function saveRecord(text) {
-        const records = JSON.parse(localStorage.getItem(STORAGE_RECORD_KEY)) || [];
-        records.push({
-            type: 'input',
-            date: new Date().toLocaleDateString(),
-            text: text
-        });
-        localStorage.setItem(STORAGE_RECORD_KEY, JSON.stringify(records));
-    }
-
-    function incrementLevel() {
-        let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY));
-        if (!roomData) {
-            roomData = { level: 1, furnitures: [] };
+        if (!title) {
+            alert('作品名を入力してください。');
+            return;
         }
-        roomData.level += 1;
-        localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
+
+        let reviews = getReviews();
+        const editingId = addReviewBtn.dataset.editingId;
+
+        if (editingId) {
+            const index = reviews.findIndex(r => r.id === parseInt(editingId));
+            if (index !== -1) {
+                reviews[index] = { ...reviews[index], title, stars, text };
+            }
+            delete addReviewBtn.dataset.editingId;
+            addReviewBtn.textContent = '追加する';
+        } else {
+            reviews.unshift({
+                id: Date.now(),
+                title: title,
+                stars: stars,
+                text: text
+            });
+        }
+        saveReviews(reviews);
+
+        reviewTitleInput.value = '';
+        reviewStarsSelect.value = '5';
+        reviewTextInput.value = '';
+        renderReviews();
+    });
+
+
+    // --- 見たい作品機能 ---
+    const wishlistTitleInput = document.getElementById('wishlist-title');
+    const addWishlistBtn = document.getElementById('add-wishlist-btn');
+    const wishlistListEl = document.getElementById('wishlist-list');
+
+    function getWishlist() {
+        return JSON.parse(localStorage.getItem(STORAGE_WISHLIST_KEY)) || [];
     }
 
-    function escapeHtml(str) {
-        return str.replace(/[&<>\\'"]/g, (tag) => {
-            const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-            return chars[tag] || tag;
+    function saveWishlist(list) {
+        localStorage.setItem(STORAGE_WISHLIST_KEY, JSON.stringify(list));
+    }
+
+    function renderWishlist() {
+        const list = getWishlist();
+        wishlistListEl.innerHTML = '';
+        
+        list.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'wishlist-item';
+            li.innerHTML = `
+                <span class="wishlist-title">${item.title}</span>
+                <div class="wishlist-actions">
+                    <label>
+                        <input type="checkbox" class="wishlist-complete-cb" data-id="${item.id}">
+                        見た！
+                    </label>
+                </div>
+            `;
+            wishlistListEl.appendChild(li);
+        });
+
+        // チェックボックスイベント
+        document.querySelectorAll('.wishlist-complete-cb').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    completeWishlist(id);
+                }
+            });
         });
     }
 
-    // 初回描画
-    renderWatched();
-    renderWatchlist();
+    addWishlistBtn.addEventListener('click', () => {
+        const title = wishlistTitleInput.value.trim();
+        if (!title) {
+            alert('作品名を入力してください。');
+            return;
+        }
+
+        const list = getWishlist();
+        list.unshift({
+            id: Date.now(),
+            title: title
+        });
+        saveWishlist(list);
+
+        wishlistTitleInput.value = '';
+        renderWishlist();
+    });
+
+    function completeWishlist(id) {
+        let list = getWishlist();
+        const index = list.findIndex(item => item.id === id);
+        
+        if (index !== -1) {
+            const completedItem = list[index];
+
+            // 記録に保存
+            const todayStr = new Date().toDateString();
+            const records = JSON.parse(localStorage.getItem('grow_up_me_records')) || [];
+            records.push({
+                type: 'input',
+                date: new Date().toLocaleDateString(),
+                content: `インプット完了: ${completedItem.title}`
+            });
+            localStorage.setItem('grow_up_me_records', JSON.stringify(records));
+
+            // 部屋レベルアップ判定
+            checkRoomLevelUp();
+
+            // リストから削除
+            list.splice(index, 1);
+            saveWishlist(list);
+
+            renderWishlist();
+            
+            // 感想タブに促すアラート（任意）
+            alert(`「${completedItem.title}」を見終わりました！\nぜひ感想タブでレビューを書いてください。`);
+        }
+    }
+
+    function checkRoomLevelUp() {
+        const STORAGE_ROOM_KEY = 'grow_up_me_room';
+        let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY));
+        if (!roomData) return;
+        
+        const todayStrLocal = new Date().toDateString();
+        if (roomData.lastReportDate !== todayStrLocal) {
+            roomData.lastReportDate = todayStrLocal;
+            if (roomData.level < 31) {
+                roomData.level++;
+            }
+            localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
+        }
+    }
+
+    // 初期描画
+    renderReviews();
+    renderWishlist();
 });

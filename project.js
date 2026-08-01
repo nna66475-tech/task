@@ -1,109 +1,145 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_PROJECT_KEY = 'grow_up_me_projects';
+// project.js
 
+document.addEventListener('DOMContentLoaded', () => {
     const projectTitleInput = document.getElementById('project-title');
-    const projectAddBtn = document.getElementById('project-add-btn');
+    const addProjectBtn = document.getElementById('add-project-btn');
     const projectListEl = document.getElementById('project-list');
 
-    let projects = JSON.parse(localStorage.getItem(STORAGE_PROJECT_KEY)) || [];
+    const STORAGE_PROJECTS_KEY = 'grow_up_me_projects';
 
-    projectAddBtn.addEventListener('click', () => {
-        const title = projectTitleInput.value.trim();
-        if (!title) {
-            alert('目標名を入力してください！');
-            return;
-        }
+    function getProjects() {
+        return JSON.parse(localStorage.getItem(STORAGE_PROJECTS_KEY)) || [];
+    }
 
-        const newProject = {
-            id: Date.now(),
-            title: title,
-            progress: 0 // 0% ~ 100%
-        };
-
-        projects.push(newProject);
-        localStorage.setItem(STORAGE_PROJECT_KEY, JSON.stringify(projects));
-        renderProjects();
-
-        projectTitleInput.value = '';
-    });
+    function saveProjects(projects) {
+        localStorage.setItem(STORAGE_PROJECTS_KEY, JSON.stringify(projects));
+    }
 
     function renderProjects() {
+        const projects = getProjects();
         projectListEl.innerHTML = '';
-        if (projects.length === 0) {
-            projectListEl.innerHTML = '<li style="font-size:11px; color:#a0a0c0; text-align:center; padding:6px;">登録されたプロジェクトはありません</li>';
-            return;
-        }
-
+        
         projects.forEach(project => {
             const li = document.createElement('li');
             li.className = 'project-item';
             li.innerHTML = `
                 <div class="project-header">
-                    <span class="project-title-text">${escapeHtml(project.title)}</span>
-                    <button class="dot-btn project-delete-btn" data-id="${project.id}">削除</button>
+                    <span class="project-title">${project.title}</span>
+                    <span class="project-progress-text">${project.progress}%</span>
                 </div>
-                <div class="project-progress-area">
-                    <div class="progress-info">
-                        <span>進捗</span>
-                        <span>${project.progress}%</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${project.progress}%"></div>
+                </div>
+                <div class="project-controls">
+                    <div style="display:flex; gap:8px;">
+                        <button class="ctrl-btn dec-btn" data-id="${project.id}">-</button>
+                        <button class="ctrl-btn inc-btn" data-id="${project.id}">+</button>
                     </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" style="width: ${project.progress}%;"></div>
-                    </div>
-                    <div class="progress-controls">
-                        <button class="dot-btn progress-btn" data-id="${project.id}" data-action="minus">-10%</button>
-                        <button class="dot-btn progress-btn" data-id="${project.id}" data-action="plus">+10%</button>
-                    </div>
+                    ${project.progress === 100 ? `<button class="ctrl-btn complete-btn" data-id="${project.id}">完了にする</button>` : ''}
                 </div>
             `;
             projectListEl.appendChild(li);
         });
 
-        // イベントリスナーの割り当て
-        document.querySelectorAll('.project-delete-btn').forEach(btn => {
+        // 減らすボタン
+        document.querySelectorAll('.dec-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = Number(e.target.getAttribute('data-id'));
-                deleteProject(id);
+                const id = parseInt(e.target.getAttribute('data-id'));
+                updateProgress(id, -10); // 10%ずつ
             });
         });
 
-        document.querySelectorAll('.progress-btn').forEach(btn => {
+        // 増やすボタン
+        document.querySelectorAll('.inc-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = Number(e.target.getAttribute('data-id'));
-                const action = e.target.getAttribute('data-action');
-                updateProgress(id, action);
+                const id = parseInt(e.target.getAttribute('data-id'));
+                updateProgress(id, 10);
+            });
+        });
+
+        // 完了にするボタン
+        document.querySelectorAll('.complete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                completeProject(id);
             });
         });
     }
 
-    function updateProgress(id, action) {
-        const project = projects.find(p => p.id === id);
-        if (!project) return;
-
-        if (action === 'plus') {
-            project.progress = Math.min(100, project.progress + 10);
-        } else if (action === 'minus') {
-            project.progress = Math.max(0, project.progress - 10);
+    addProjectBtn.addEventListener('click', () => {
+        const title = projectTitleInput.value.trim();
+        if (!title) {
+            alert('目標を入力してください。');
+            return;
         }
 
-        localStorage.setItem(STORAGE_PROJECT_KEY, JSON.stringify(projects));
-        renderProjects();
-    }
-
-    function deleteProject(id) {
-        if (!confirm('このプロジェクトを削除しますか？')) return;
-        projects = projects.filter(p => p.id !== id);
-        localStorage.setItem(STORAGE_PROJECT_KEY, JSON.stringify(projects));
-        renderProjects();
-    }
-
-    function escapeHtml(str) {
-        return String(str).replace(/[&<>\\'"]/g, (tag) => {
-            const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-            return chars[tag] || tag;
+        const projects = getProjects();
+        projects.unshift({
+            id: Date.now(),
+            title: title,
+            progress: 0
         });
+        saveProjects(projects);
+
+        projectTitleInput.value = '';
+        renderProjects();
+    });
+
+    function updateProgress(id, change) {
+        let projects = getProjects();
+        const target = projects.find(p => p.id === id);
+        if (target) {
+            target.progress += change;
+            if (target.progress < 0) target.progress = 0;
+            if (target.progress > 100) target.progress = 100;
+            saveProjects(projects);
+            renderProjects();
+        }
     }
 
-    // 初回描画
+    function completeProject(id) {
+        let projects = getProjects();
+        const index = projects.findIndex(p => p.id === id);
+        
+        if (index !== -1) {
+            const completedProject = projects[index];
+
+            // 記録に保存
+            const records = JSON.parse(localStorage.getItem('grow_up_me_records')) || [];
+            records.push({
+                type: 'report',
+                date: new Date().toLocaleDateString(),
+                content: `プロジェクト達成: ${completedProject.title}`
+            });
+            localStorage.setItem('grow_up_me_records', JSON.stringify(records));
+
+            // 部屋レベルアップ判定
+            checkRoomLevelUp();
+
+            // プロジェクトから削除
+            projects.splice(index, 1);
+            saveProjects(projects);
+
+            renderProjects();
+            alert(`「${completedProject.title}」を達成しました！素晴らしいです！`);
+        }
+    }
+
+    function checkRoomLevelUp() {
+        const STORAGE_ROOM_KEY = 'grow_up_me_room';
+        let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY));
+        if (!roomData) return;
+        
+        const todayStrLocal = new Date().toDateString();
+        if (roomData.lastReportDate !== todayStrLocal) {
+            roomData.lastReportDate = todayStrLocal;
+            if (roomData.level < 31) {
+                roomData.level++;
+            }
+            localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
+        }
+    }
+
+    // 初期描画
     renderProjects();
 });

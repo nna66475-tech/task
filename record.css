@@ -1,62 +1,44 @@
-/* record.html 専用スタイル */
-.month-selector-box {
+/* record.css */
+
+.month-selector {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-}
-
-.calendar-title {
-    font-size: 14px;
-    color: #ffcc00;
-}
-
-.tab-container {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 12px;
-}
-
-.tab-btn {
-    flex: 1;
-    font-size: 11px;
-    padding: 6px 2px;
-    background-color: #2b2b40;
-    text-align: center;
-}
-
-.tab-btn.active {
-    background-color: #00ffcc;
-    color: #000;
-}
-
-.tab-content.hidden {
-    display: none;
-}
-
-.sub-title {
-    font-size: 13px;
-    margin-bottom: 8px;
-    color: #ffcc00;
-}
-
-.record-item {
-    font-size: 12px;
+    margin: 12px 16px;
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
     padding: 8px;
-    margin-bottom: 6px;
-    background-color: #3b3b5c;
-    border: 2px solid #6b6b9c;
+}
+
+.calendar-nav-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.scroll-box {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.record-list li {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    margin-bottom: 8px;
+    padding: 12px;
 }
 
 .record-date {
-    font-size: 10px;
-    color: #00ffcc;
+    font-size: 12px;
+    color: var(--accent-color);
+    margin-bottom: 4px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 4px;
 }
 
-.record-text {
-    color: #fff;
-    word-break: break-all;
+.record-content {
+    font-size: 14px;
+    line-height: 1.4;
 }

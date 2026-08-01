@@ -2,14 +2,14 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - ホーム</title>
-    <!-- 修正: ../ を削除しました -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 読み込み中画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <!-- ローディング画面 (各ページ遷移時) -->
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
             <div class="loading-bar-container">
@@ -18,57 +18,99 @@
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">Grow Up Me!</h1>
-            <div id="date-display" class="date-display">2026/07/31 (Fri)</div>
-        </header>
-
-        <!-- ログイン画面のコンテナ内など、配置したい場所に追加 -->
-        <div class="login-image-container">
-            <!-- 修正: ../ を削除しました -->
-            <img src="home.gif" alt="ホーム画像" class="responsive-home-img">
+    <!-- アプリ全体コンテナ -->
+    <div id="app" class="app-container home-container">
+        <!-- 記憶リセット時の初めまして画面 -->
+        <div id="first-login-screen" class="first-login-overlay hidden">
+            <div class="first-login-content">
+                <div class="img-crop-bottom first-login-img-container">
+                    <img src="1home.PNG" alt="初めまして" class="character-img">
+                </div>
+               <div id="first-login-dialogue-box" class="dialogue-box hidden"> <!-- ← ここにidを追加し、最初はhiddenで隠しておく -->
+    <p id="first-login-text">……お前、誰だっけ？<br>……まあいい、俺はいつでもここにいる。<br>よろしくな。</p>
+</div>
+<button id="first-login-btn" class="dot-btn large-btn">よろしく！</button>
+            </div>
         </div>
 
-        <main class="main-content">
-            <!-- ログインセクション -->
-            <section id="login-section" class="login-section">
-                <button id="login-btn" class="dot-btn">ログイン</button>
-            </section>
+        <!-- 月末の別れ画面 -->
+        <div id="reset-warning-screen" class="reset-warning-overlay hidden">
+            <div class="reset-warning-content">
+                <div class="img-crop-bottom reset-warning-img-container">
+                    <img src="home5.png" alt="お別れ" class="character-img">
+                </div>
+                <div class="dialogue-box">
+                    <p id="reset-warning-text"></p>
+                </div>
+            </div>
+        </div>
 
-            <!-- 8個のアイコン（2列表示） -->
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <span class="nav-title">ホーム</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
+
+        <!-- ホーム独自コンテンツ -->
+        <main class="home-main">
+            <div class="home-header">
+                <div id="date-display" class="date-display">2026/08/01 (Sat)</div>
+            </div>
+
+            <div class="character-section">
+                <div class="character-img-wrapper img-crop-bottom">
+                    <img id="home-character-img" src="home.gif" alt="ホーム画像" class="character-img">
+                </div>
+            </div>
+
+            <div class="login-action-section">
+                <button id="daily-login-btn" class="dot-btn large-btn">ログイン</button>
+            </div>
+
             <nav class="icon-grid">
-                <!-- 修正: すべてのリンクから ../ を削除しました -->
-                <a href="room.html" class="icon-card">
+                <a href="room.html" class="icon-card" data-page="room">
                     <div class="icon-box">🏠</div>
                     <span>マイルーム</span>
                 </a>
-                <a href="task.html" class="icon-card">
+                <a href="task.html" class="icon-card" data-page="task">
                     <div class="icon-box">⚔️</div>
                     <span>タスク</span>
                 </a>
-                <a href="schedule.html" class="icon-card">
+                <a href="schedule.html" class="icon-card" data-page="schedule">
                     <div class="icon-box">📅</div>
                     <span>スケジュール</span>
                 </a>
-                <a href="input.html" class="icon-card">
+                <a href="input.html" class="icon-card" data-page="input">
                     <div class="icon-box">📖</div>
                     <span>インプット</span>
                 </a>
-                <a href="record.html" class="icon-card">
+                <a href="record.html" class="icon-card" data-page="record">
                     <div class="icon-box">📜</div>
                     <span>記録</span>
                 </a>
-                <a href="project.html" class="icon-card">
+                <a href="project.html" class="icon-card" data-page="project">
                     <div class="icon-box">🚩</div>
                     <span>プロジェクト</span>
                 </a>
-                <a href="mypage.html" class="icon-card">
+                <a href="mypage.html" class="icon-card" data-page="mypage">
                     <div class="icon-box">👤</div>
                     <span>マイページ</span>
                 </a>
-                <a href="custom.html" class="icon-card">
+                <a href="custom.html" class="icon-card" data-page="custom">
                     <div class="icon-box">⚙️</div>
                     <span>カスタム</span>
                 </a>
@@ -76,7 +118,6 @@
         </main>
     </div>
 
-    <!-- 修正: ../ を削除しました -->
     <script src="script.js"></script>
 </body>
 </html>

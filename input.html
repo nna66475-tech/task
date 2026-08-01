@@ -2,78 +2,89 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - インプット</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="input.css">
 </head>
 <body>
-    <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">インプット管理</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
+    <div id="app" class="app-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">インプット</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
 
-        <!-- タブ切り替え -->
         <div class="tab-container">
-            <button class="dot-btn tab-btn active" data-target="tab-watched">見た作品</button>
-            <button class="dot-btn tab-btn" data-target="tab-watchlist">見たい作品</button>
+            <button class="dot-btn tab-btn active" data-target="tab-review">感想</button>
+            <button class="dot-btn tab-btn" data-target="tab-wishlist">見たい作品</button>
         </div>
 
         <main class="main-content">
-            <!-- 【見た作品タブ】 -->
-            <section id="tab-watched" class="tab-content">
+            <!-- 【感想タブ】 -->
+            <section id="tab-review" class="tab-content">
                 <div class="content-box">
-                    <h2 class="sub-title">感想・評価を記録</h2>
-                    <div class="input-form">
-                        <input type="text" id="watched-title" class="dot-input" placeholder="作品名">
-                        
-                        <div class="star-rating-box">
-                            <label>評価:</label>
-                            <select id="watched-stars" class="dot-input">
-                                <option value="5">★★★★★ (5)</option>
-                                <option value="4">★★★★☆ (4)</option>
-                                <option value="3">★★★☆☆ (3)</option>
-                                <option value="2">★★☆☆☆ (2)</option>
-                                <option value="1">★☆☆☆☆ (1)</option>
-                            </select>
-                        </div>
-
-                        <textarea id="watched-review" class="dot-textarea" placeholder="レビュー・感想"></textarea>
-                        <button id="watched-save-btn" class="dot-btn primary-btn">保存する</button>
+                    <input type="text" id="review-title" class="dot-input" placeholder="作品名" style="width:100%; margin-bottom:8px;">
+                    
+                    <div class="star-rating" style="margin-bottom:8px;">
+                        <span>評価：</span>
+                        <select id="review-stars" class="dot-input">
+                            <option value="5">★★★★★</option>
+                            <option value="4">★★★★☆</option>
+                            <option value="3">★★★☆☆</option>
+                            <option value="2">★★☆☆☆</option>
+                            <option value="1">★☆☆☆☆</option>
+                        </select>
                     </div>
+
+                    <textarea id="review-text" class="dot-textarea" placeholder="レビュー"></textarea>
+                    <button id="add-review-btn" class="dot-btn" style="width: 100%;">追加する</button>
                 </div>
 
-                <div class="content-box">
-                    <h2 class="sub-title">見た作品一覧</h2>
-                    <ul id="watched-list" class="dot-list">
+                <div class="content-box scroll-box">
+                    <h2 class="sub-title">感想一覧</h2>
+                    <ul id="review-list" class="dot-list">
                         <!-- JSで動的生成 -->
                     </ul>
                 </div>
             </section>
 
             <!-- 【見たい作品タブ】 -->
-            <section id="tab-watchlist" class="tab-content hidden">
+            <section id="tab-wishlist" class="tab-content hidden">
                 <div class="content-box">
-                    <h2 class="sub-title">気になっている作品を追加</h2>
-                    <div class="input-form">
-                        <input type="text" id="watchlist-title" class="dot-input" placeholder="見たい作品名">
-                        <button id="watchlist-add-btn" class="dot-btn primary-btn">追加する</button>
-                    </div>
+                    <input type="text" id="wishlist-title" class="dot-input" placeholder="見たい・気になっている作品名" style="width:100%; margin-bottom:8px;">
+                    <button id="add-wishlist-btn" class="dot-btn" style="width: 100%;">追加する</button>
                 </div>
 
-                <div class="content-box">
-                    <h2 class="sub-title">見たい作品一覧</h2>
-                    <ul id="watchlist-list" class="dot-list">
+                <div class="content-box scroll-box">
+                    <h2 class="sub-title">見たい作品リスト</h2>
+                    <p style="font-size:10px; color:#a0a0c0; margin-bottom:8px;">※チェックすると記録に保存され、部屋のレベルが上がります</p>
+                    <ul id="wishlist-list" class="dot-list">
                         <!-- JSで動的生成 -->
                     </ul>
                 </div>

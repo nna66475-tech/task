@@ -1,163 +1,201 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_TASK_KEY = 'grow_up_me_tasks';
-    const STORAGE_RECORD_KEY = 'grow_up_me_records';
-    const STORAGE_ROOM_KEY = 'grow_up_me_room';
+// task.js
 
-    const taskTitleInput = document.getElementById('task-title-input');
-    const taskStartInput = document.getElementById('task-start-input');
-    const taskDueInput = document.getElementById('task-due-input');
-    const taskAddBtn = document.getElementById('task-add-btn');
+document.addEventListener('DOMContentLoaded', () => {
+    const taskNameInput = document.getElementById('task-name');
+    const taskStartInput = document.getElementById('task-start');
+    const taskEndInput = document.getElementById('task-end');
+    const addTaskBtn = document.getElementById('add-task-btn');
     const taskListEl = document.getElementById('task-list');
 
-    // 初期日付を今日に設定
-    const todayStr = new Date().toISOString().split('T')[0];
+    const STORAGE_TASKS_KEY = 'grow_up_me_tasks';
+
+    // デフォルト日付の設定
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
     taskStartInput.value = todayStr;
-    taskDueInput.value = todayStr;
+    taskEndInput.value = todayStr;
 
-    // タスクデータの読み込み
-    let tasks = JSON.parse(localStorage.getItem(STORAGE_TASK_KEY)) || [];
+    function getTasks() {
+        return JSON.parse(localStorage.getItem(STORAGE_TASKS_KEY)) || [];
+    }
 
-    // 追加ボタンイベント
-    taskAddBtn.addEventListener('click', () => {
-        const title = taskTitleInput.value.trim();
-        const startDate = taskStartInput.value;
-        const dueDate = taskDueInput.value;
+    function saveTasks(tasks) {
+        localStorage.setItem(STORAGE_TASKS_KEY, JSON.stringify(tasks));
+    }
 
-        if (!title) {
-            alert('タスク名を入力してください！');
-            return;
-        }
-        if (!startDate || !dueDate) {
-            alert('開始日と締切日を設定してください！');
-            return;
-        }
-        if (startDate > dueDate) {
-            alert('開始日は締切日より前の日付にしてください！');
-            return;
-        }
-
-        const newTask = {
-            id: Date.now(),
-            title: title,
-            startDate: startDate,
-            dueDate: dueDate
-        };
-
-        tasks.push(newTask);
-        saveAndRender();
-
-        // フォームリセット
-        taskTitleInput.value = '';
-        taskStartInput.value = todayStr;
-        taskDueInput.value = todayStr;
-    });
-
-    function saveAndRender() {
-        // 優先順位（締切が近い順）でソート
-        tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-        localStorage.setItem(STORAGE_TASK_KEY, JSON.stringify(tasks));
-        renderTasks();
+    function calculatePriority(task) {
+        const endDate = new Date(task.end);
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        const diffTime = endDate - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
     }
 
     function renderTasks() {
+        let tasks = getTasks();
+        
+        // 優先順位（残り日数）の計算とソート。日数が少ない（締め切りが近い）ほど上
+        tasks.forEach(t => t.remainingDays = calculatePriority(t));
+        tasks.sort((a, b) => a.remainingDays - b.remainingDays);
+
         taskListEl.innerHTML = '';
-
-        if (tasks.length === 0) {
-            taskListEl.innerHTML = '<li style="text-align:center; font-size:12px; color:#a0a0c0; padding:10px;">タスクはありません</li>';
-            return;
-        }
-
-        const todayDate = new Date();
-        todayDate.setHours(0,0,0,0);
-
-        tasks.forEach((task) => {
-            const dueDateObj = new Date(task.dueDate);
-            dueDateObj.setHours(0,0,0,0);
+        
+        tasks.forEach(task => {
+            let priorityText = "";
+            let priorityClass = "";
             
-            const diffTime = dueDateObj - todayDate;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            // 期限に基づく優先度の自動計算と表示切り替え
-            let priorityClass = 'priority-low';
-            let badgeClass = 'priority-low-badge';
-            let priorityText = '優先度: 低';
-
-            if (diffDays <= 0) {
-                priorityClass = 'priority-high';
-                badgeClass = 'priority-high-badge';
-                priorityText = '優先度: 高 (期限間近)';
-            } else if (diffDays <= 3) {
-                priorityClass = 'priority-mid';
-                badgeClass = 'priority-mid-badge';
-                priorityText = '優先度: 中';
+            if (task.remainingDays < 0) {
+                priorityText = "期限超過！";
+                priorityClass = "urgent";
+            } else if (task.remainingDays === 0) {
+                priorityText = "今日まで！";
+                priorityClass = "urgent";
+            } else {
+                priorityText = `あと${task.remainingDays}日`;
             }
 
             const li = document.createElement('li');
-            li.className = `task-item ${priorityClass}`;
+            li.className = 'task-item';
             li.innerHTML = `
-                <div class="task-info">
-                    <span class="task-title-text">${escapeHtml(task.title)}</span>
-                    <span class="task-dates">開始: ${task.startDate} 〜 締切: ${task.dueDate}</span>
-                    <span class="task-priority-badge ${badgeClass}">${priorityText}</span>
+                <div class="task-header">
+                    <span class="task-name">${task.name}</span>
+                    <span class="task-priority ${priorityClass}">${priorityText}</span>
                 </div>
-                <input type="checkbox" class="task-check" data-id="${task.id}" title="完了して記録へ保存">
+                <div class="task-dates">
+                    ${task.start} 〜 ${task.end}
+                </div>
+                <div class="task-actions">
+                    <label class="task-checkbox-label">
+                        <input type="checkbox" class="task-complete-cb" data-id="${task.id}">
+                        クリア！
+                    </label>
+                </div>
             `;
             taskListEl.appendChild(li);
         });
 
-        // チェックボックスのイベント (完了・削除・記録保存・レベル+1)
-        document.querySelectorAll('.task-check').forEach(chk => {
-            chk.addEventListener('change', (e) => {
+        // チェックボックスのイベント
+        document.querySelectorAll('.task-complete-cb').forEach(cb => {
+            cb.addEventListener('change', (e) => {
                 if (e.target.checked) {
-                    const taskId = Number(e.target.getAttribute('data-id'));
-                    completeTask(taskId);
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    completeTask(id);
                 }
             });
         });
     }
 
-    function completeTask(taskId) {
-        const targetTaskIndex = tasks.findIndex(t => t.id === taskId);
-        if (targetTaskIndex === -1) return;
+    addTaskBtn.addEventListener('click', () => {
+        const name = taskNameInput.value.trim();
+        const start = taskStartInput.value;
+        const end = taskEndInput.value;
 
-        const completedTask = tasks[targetTaskIndex];
-
-        // 1. タスクリストから削除
-        tasks.splice(targetTaskIndex, 1);
-        localStorage.setItem(STORAGE_TASK_KEY, JSON.stringify(tasks));
-
-        // 2. 記録（レコード）へ保存
-        const records = JSON.parse(localStorage.getItem(STORAGE_RECORD_KEY)) || [];
-        records.push({
-            type: 'task',
-            date: new Date().toLocaleDateString(),
-            text: `完了タスク: ${completedTask.title}`
-        });
-        localStorage.setItem(STORAGE_RECORD_KEY, JSON.stringify(records));
-
-        // 3. レベル+1
-        incrementLevel();
-
-        alert(`「${completedTask.title}」を完了しました！\n記録に保存され、レベルが上がりました！`);
-        renderTasks();
-    }
-
-    function incrementLevel() {
-        let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY));
-        if (!roomData) {
-            roomData = { level: 1, furnitures: [] };
+        if (!name || !start || !end) {
+            alert('タスク名と日付を入力してください。');
+            return;
         }
-        roomData.level += 1;
-        localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
-    }
+        if (new Date(start) > new Date(end)) {
+            alert('開始日は終了日より前に設定してください。');
+            return;
+        }
 
-    function escapeHtml(str) {
-        return str.replace(/[&<>\\'"]/g, (tag) => {
-            const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-            return chars[tag] || tag;
+        const tasks = getTasks();
+        tasks.push({
+            id: Date.now(),
+            name: name,
+            start: start,
+            end: end
         });
+        saveTasks(tasks);
+        
+        taskNameInput.value = '';
+        renderTasks();
+    });
+
+    function completeTask(id) {
+        let tasks = getTasks();
+        const taskIndex = tasks.findIndex(t => t.id === id);
+        
+        if (taskIndex !== -1) {
+            const completedTask = tasks[taskIndex];
+            
+            // 記録に保存
+            const records = JSON.parse(localStorage.getItem('grow_up_me_records')) || [];
+            records.push({
+                type: 'task',
+                date: todayStr,
+                content: `タスク完了: ${completedTask.name}`
+            });
+            localStorage.setItem('grow_up_me_records', JSON.stringify(records));
+
+            // 部屋レベルアップ判定
+            checkRoomLevelUp();
+
+            // タスクから削除
+            tasks.splice(taskIndex, 1);
+            saveTasks(tasks);
+
+            renderTasks();
+        }
     }
 
-    // 初回描画
+    function checkRoomLevelUp() {
+        const STORAGE_ROOM_KEY = 'grow_up_me_room';
+        let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY));
+        if (!roomData) return;
+        
+        const todayStrLocal = new Date().toDateString();
+        // 1日1回だけレベルアップの仕様
+        if (roomData.lastReportDate !== todayStrLocal) {
+            roomData.lastReportDate = todayStrLocal;
+            if (roomData.level < 31) {
+                roomData.level++;
+            }
+            localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
+        }
+    }
+
+    // --- コピー機能 ---
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        const tasks = getTasks();
+        if (tasks.length === 0) {
+            alert('タスクがありません。');
+            return;
+        }
+        
+        let textToCopy = "【タスク一覧】\n";
+        tasks.forEach(t => {
+            textToCopy += `・${t.name} (${t.start}〜${t.end})\n`;
+        });
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('タスク一覧をクリップボードにコピーしました！');
+        }).catch(() => {
+            alert('コピーに失敗しました。');
+        });
+    });
+
+    // --- スクショ保存機能 (html2canvas) ---
+    document.getElementById('screenshot-btn').addEventListener('click', () => {
+        const targetElement = document.getElementById('task-list-container');
+        
+        html2canvas(targetElement, {
+            backgroundColor: '#2b2b40' // アプリの背景色
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `tasks_${todayStr}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }).catch(err => {
+            console.error(err);
+            alert('スクリーンショットの保存に失敗しました。');
+        });
+    });
+
+    // 初期描画
     renderTasks();
 });

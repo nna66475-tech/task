@@ -1,16 +1,6 @@
+// record.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_RECORD_KEY = 'grow_up_me_records';
-    const STORAGE_TASK_KEY = 'grow_up_me_tasks';
-    const STORAGE_WATCHED_KEY = 'grow_up_me_watched';
-
-    const monthTitleEl = document.getElementById('month-title');
-    const prevMonthBtn = document.getElementById('prev-month-btn');
-    const nextMonthBtn = document.getElementById('next-month-btn');
-
-    const dailyListEl = document.getElementById('daily-list');
-    const tasksListEl = document.getElementById('tasks-list');
-    const watchedListEl = document.getElementById('watched-list');
-
     // タブ切り替え
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -26,109 +16,102 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 現在表示している年・月
+    const monthDisplay = document.getElementById('month-display');
+    const prevMonthBtn = document.getElementById('prev-month-btn');
+    const nextMonthBtn = document.getElementById('next-month-btn');
+
+    const reportListEl = document.getElementById('report-list');
+    const taskListEl = document.getElementById('task-list');
+    const inputListEl = document.getElementById('input-list');
+
     let currentDate = new Date();
-    let currentYear = currentDate.getFullYear();
-    let currentMonth = currentDate.getMonth(); // 0-11
 
-    function renderRecords() {
-        monthTitleEl.textContent = `${currentYear}年 ${currentMonth + 1}月`;
-
-        // 1. 今日やったこと (recordsストレージから)
-        const allRecords = JSON.parse(localStorage.getItem(STORAGE_RECORD_KEY)) || [];
-        const filteredDaily = allRecords.filter(item => {
-            const d = new Date(item.date || item.id || Date.now());
-            return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    function getRecords() {
+        let records = JSON.parse(localStorage.getItem('grow_up_me_records')) || [];
+        let modified = false;
+        records.forEach((r, idx) => {
+            if (!r.id) {
+                r.id = Date.now() + idx;
+                modified = true;
+            }
         });
-
-        dailyListEl.innerHTML = '';
-        if (filteredDaily.length === 0) {
-            dailyListEl.innerHTML = '<li style="font-size:11px; color:#a0a0c0; text-align:center; padding:6px;">この月の記録はありません</li>';
-        } else {
-            filteredDaily.forEach(item => {
-                const liEl = document.createElement('li');
-                liEl.className = 'record-item';
-                liEl.innerHTML = `
-                    <span class="record-date">${escapeHtml(item.date || '')}</span>
-                    <span class="record-text">${escapeHtml(item.text || item.title || '')}</span>
-                `;
-                dailyListEl.appendChild(liEl);
-            });
-        }
-
-        // 2. 完了タスク (tasksストレージで completed === true のもの)
-        const allTasks = JSON.parse(localStorage.getItem(STORAGE_TASK_KEY)) || [];
-        const filteredTasks = allTasks.filter(task => {
-            if (!task.completed || !task.completedDate) return false;
-            const d = new Date(task.completedDate);
-            return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
-        });
-
-        tasksListEl.innerHTML = '';
-        if (filteredTasks.length === 0) {
-            tasksListEl.innerHTML = '<li style="font-size:11px; color:#a0a0c0; text-align:center; padding:6px;">この月に完了したタスクはありません</li>';
-        } else {
-            filteredTasks.forEach(task => {
-                const liEl = document.createElement('li');
-                liEl.className = 'record-item';
-                liEl.innerHTML = `
-                    <span class="record-date">完了日: ${escapeHtml(task.completedDate)}</span>
-                    <span class="record-text">${escapeHtml(task.title)}</span>
-                `;
-                tasksListEl.appendChild(liEl);
-            });
-        }
-
-        // 3. 見た作品 (watchedストレージから)
-        const allWatched = JSON.parse(localStorage.getItem(STORAGE_WATCHED_KEY)) || [];
-        const filteredWatched = allWatched.filter(item => {
-            const d = new Date(item.id || Date.now());
-            return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
-        });
-
-        watchedListEl.innerHTML = '';
-        if (filteredWatched.length === 0) {
-            watchedListEl.innerHTML = '<li style="font-size:11px; color:#a0a0c0; text-align:center; padding:6px;">この月に見た作品はありません</li>';
-        } else {
-            filteredWatched.forEach(item => {
-                const liEl = document.createElement('li');
-                liEl.className = 'record-item';
-                const starsStr = '★'.repeat(item.stars || 0) + '☆'.repeat(5 - (item.stars || 0));
-                liEl.innerHTML = `
-                    <span class="record-date">${starsStr}</span>
-                    <span class="record-text"><strong>${escapeHtml(item.title)}</strong>${item.review ? '<br>' + escapeHtml(item.review) : ''}</span>
-                `;
-                watchedListEl.appendChild(liEl);
-            });
-        }
+        if (modified) localStorage.setItem('grow_up_me_records', JSON.stringify(records));
+        return records;
     }
 
-    // 月切り替えボタン
-    prevMonthBtn.addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
+    function renderRecords() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        monthDisplay.textContent = `${year}年 ${month + 1}月`;
+        
+        const allRecords = getRecords();
+        
+        // 当月の記録のみを抽出
+        const currentMonthRecords = allRecords.filter(r => {
+            const dateStr = r.date.replace(/\//g, '-');
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return false;
+            return d.getFullYear() === year && d.getMonth() === month;
+        });
+
+        const reportRecords = currentMonthRecords.filter(r => r.type === 'report');
+        const taskRecords = currentMonthRecords.filter(r => r.type === 'task');
+        const inputRecords = currentMonthRecords.filter(r => r.type === 'input');
+
+        function createListHTML(records, emptyMessage, isReport = false) {
+            if (records.length === 0) {
+                return `<li style="text-align:center; color:#6b6b9c; border:none; background:transparent;">${emptyMessage}</li>`;
+            }
+            return records.map(r => `
+                <li>
+                    <div class="record-date">
+                        ${r.date}
+                        ${isReport ? `<button class="dot-btn edit-date-btn" data-id="${r.id}" style="font-size:10px; padding:2px 4px; margin-left:8px;">日付変更</button>` : ''}
+                    </div>
+                    <div class="record-content">${r.content}</div>
+                </li>
+            `).join('');
         }
+
+        reportListEl.innerHTML = createListHTML(reportRecords, "この月の報告はありません。", true);
+        taskListEl.innerHTML = createListHTML(taskRecords, "この月の完了タスクはありません。");
+        inputListEl.innerHTML = createListHTML(inputRecords, "この月のインプット記録はありません。");
+
+        // 日付変更ボタンのイベント
+        document.querySelectorAll('.edit-date-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                const records = getRecords();
+                const record = records.find(r => r.id === id);
+                if (record) {
+                    const newDate = prompt('新しい日付を入力してください\n(形式: YYYY/MM/DD)', record.date);
+                    if (newDate) {
+                        // 形式の簡易バリデーション
+                        if (/^\d{4}\/\d{2}\/\d{2}$/.test(newDate) || /^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+                            record.date = newDate;
+                            localStorage.setItem('grow_up_me_records', JSON.stringify(records));
+                            renderRecords();
+                            alert('日付を変更しました。');
+                        } else {
+                            alert('日付の形式が正しくありません。\nYYYY/MM/DDの形式で入力してください。');
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
         renderRecords();
     });
 
     nextMonthBtn.addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+        currentDate.setMonth(currentDate.getMonth() + 1);
         renderRecords();
     });
 
-    function escapeHtml(str) {
-        return String(str).replace(/[&<>\\'"]/g, (tag) => {
-            const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-            return chars[tag] || tag;
-        });
-    }
-
-    // 初回描画
+    // 初期描画
     renderRecords();
 });

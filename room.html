@@ -2,46 +2,79 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - マイルーム</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="room.css">
 </head>
-<body>
+<body class="room-body">
     <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
     <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">マイルーム</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
+    <div id="app" class="app-container room-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">マイルーム</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
 
-        <!-- タブ切り替え -->
+        <!-- タブ切り替えボタン（ここに1つだけ配置） -->
         <div class="tab-container">
             <button class="dot-btn tab-btn active" data-target="tab-report">報告</button>
             <button class="dot-btn tab-btn" data-target="tab-room">部屋</button>
         </div>
 
-        <main class="main-content">
+        <main class="main-content" style="display:flex; flex-direction:column; height:100%;">
+            
             <!-- 【報告タブ】 -->
             <section id="tab-report" class="tab-content">
-                <div class="content-box">
-                    <p class="report-desc">今日の出来事や頑張ったことを報告しよう！</p>
-                    <textarea id="report-input" class="dot-textarea" placeholder="例：バイト、何もしてない、勉強した、など..."></textarea>
-                    <button id="report-send-btn" class="dot-btn primary-btn">送信する</button>
+                <!-- キャラクターとセリフの表示エリア -->
+                <div class="room-visual-area" style="margin: 10px 0; text-align: center; overflow: hidden;">
+                    <div id="room-bg" class="room-bg" style="position: relative; height: 380px; display: flex; justify-content: center; align-items: flex-end; background: transparent;">
+                        <div class="char-wrapper" style="position: relative; width: 230px; bottom: 0; left: auto; transform: none; margin: 0 auto;">
+                            <!-- 画像を枠で囲み、背景を白に設定 -->
+                            <div class="img-crop-bottom" style="border: 3px solid #000; box-shadow: 4px 4px 0px rgba(0,0,0,0.5); background: white; border-radius: 4px; overflow: hidden;">
+                                <img id="room-char-img" src="home4.PNG" alt="キャラ" class="character-img clickable-char" style="width: 100%; height: auto; aspect-ratio: 2099 / 2923; object-fit: contain; display: block;">
+                            </div>
+                            <!-- セリフの長さに応じて文字サイズを自動で変えるインラインスクリプト -->
+                            <div id="char-dialogue-box" class="dialogue-box" style="margin-top: 8px;">
+                                <p id="char-text" style="font-size: clamp(12px, 4vw, 18px); line-height: 1.4;">今日は何をした？</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 返答表示エリア -->
-                <div id="response-box" class="content-box response-box hidden">
-                    <p class="response-speaker">🤖 Grow Up Me!</p>
-                    <p id="response-text" class="response-text"></p>
+                <div class="character-talk-section">
+                    <p id="top-msg" class="top-msg hidden">よくやった！</p>
+                </div>
+
+                <div class="content-box">
+                    <textarea id="report-input" class="dot-textarea" placeholder="今日は何をした？"></textarea>
+                    <button id="report-send-btn" class="dot-btn large-btn" style="width: 100%;">報告する</button>
                 </div>
             </section>
 
@@ -51,8 +84,14 @@
                     <p>部屋レベル: <span id="room-level">1</span></p>
                 </div>
 
+                <!-- 部屋ビュー (ドット絵家具・aruku.gif) -->
+                <div id="room-view" class="room-view">
+                    <img id="aruku-char" src="aruku.gif" class="aruku-char hidden" alt="歩くキャラ">
+                    <!-- 家具がJSでここに追加される -->
+                </div>
+
                 <div class="content-box">
-                    <h2 class="sub-title">家具一覧（配置）</h2>
+                    <h2 class="sub-title">家具</h2>
                     <ul id="furniture-list" class="dot-list">
                         <!-- JSで動的生成 -->
                     </ul>

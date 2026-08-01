@@ -2,51 +2,65 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - タスク</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="task.css">
+    <!-- html2canvas for screenshot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">タスク管理</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
+    <div id="app" class="app-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">タスク一覧・締切</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
 
         <main class="main-content">
-            <!-- タスク追加フォーム -->
             <div class="content-box">
-                <h2 class="sub-title">新規タスク追加</h2>
-                <div class="task-form">
-                    <input type="text" id="task-title-input" class="dot-input" placeholder="タスク名を入力...">
-                    
-                    <div class="date-input-group">
-                        <label>開始日:</label>
-                        <input type="date" id="task-start-input" class="dot-input">
-                    </div>
-                    
-                    <div class="date-input-group">
-                        <label>締切日:</label>
-                        <input type="date" id="task-due-input" class="dot-input">
-                    </div>
-
-                    <button id="task-add-btn" class="dot-btn primary-btn">追加する</button>
+                <h2 class="sub-title">タスク追加</h2>
+                <input type="text" id="task-name" class="dot-input" placeholder="タスク名" style="width:100%; margin-bottom:8px;">
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <input type="date" id="task-start" class="dot-input" style="flex:1">
+                    <span style="display:flex; align-items:center;">〜</span>
+                    <input type="date" id="task-end" class="dot-input" style="flex:1">
                 </div>
+                <button id="add-task-btn" class="dot-btn" style="width:100%;">追加する</button>
             </div>
 
-            <!-- タスク一覧表示（期限が近い順） -->
-            <div class="content-box">
-                <h2 class="sub-title">タスク一覧 (期限順)</h2>
+            <div class="action-buttons" style="display:flex; gap:8px; margin-bottom:12px;">
+                <button id="copy-btn" class="dot-btn" style="flex:1; font-size:12px;">表をコピー</button>
+                <button id="screenshot-btn" class="dot-btn" style="flex:1; font-size:12px;">スクショ保存</button>
+            </div>
+
+            <div id="task-list-container" class="content-box">
+                <h2 class="sub-title">今日やるべきこと（優先順）</h2>
                 <ul id="task-list" class="dot-list">
                     <!-- JSで動的生成 -->
                 </ul>

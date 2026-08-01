@@ -1,50 +1,56 @@
+// mypage.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_THEME_KEY = 'grow_up_me_theme';
-    const STORAGE_FONT_KEY = 'grow_up_me_font';
-
-    const colorInput = document.getElementById('color-input');
-    const colorSaveBtn = document.getElementById('color-save-btn');
+    const loginStreakEl = document.getElementById('login-streak');
+    const firstLoginDateEl = document.getElementById('first-login-date');
+    const themeColorInput = document.getElementById('theme-color-input');
+    const themeColorPicker = document.getElementById('theme-color-picker');
     const fontSelect = document.getElementById('font-select');
-    const fontSaveBtn = document.getElementById('font-save-btn');
+    const saveThemeBtn = document.getElementById('save-theme-btn');
 
-    // 保存されている設定をフォームに反映
-    const currentTheme = localStorage.getItem(STORAGE_THEME_KEY);
-    if (currentTheme) {
-        colorInput.value = currentTheme;
+    // ユーザー情報の表示
+    const userData = JSON.parse(localStorage.getItem('grow_up_me_user_data'));
+    if (userData) {
+        loginStreakEl.textContent = userData.loginStreak || 0;
+        firstLoginDateEl.textContent = userData.firstLoginDate || "記録なし";
     }
 
-    const currentFont = localStorage.getItem(STORAGE_FONT_KEY);
-    if (currentFont) {
-        fontSelect.value = currentFont;
-    }
+    // 現在の設定をフォームに反映
+    const currentTheme = localStorage.getItem('grow_up_me_theme') || '#00ffcc';
+    themeColorInput.value = currentTheme;
+    themeColorPicker.value = currentTheme;
 
-    // カラー適用
-    colorSaveBtn.addEventListener('click', () => {
-        const color = colorInput.value.trim();
-        if (!color) return;
+    const currentFont = localStorage.getItem('grow_up_me_font') || "'DotGothic16', monospace";
+    fontSelect.value = currentFont;
 
-        localStorage.setItem(STORAGE_THEME_KEY, color);
-        applySettings();
-        alert('テーマカラーを適用しました！');
+    // カラーピッカーとテキスト入力の連動
+    themeColorPicker.addEventListener('input', (e) => {
+        themeColorInput.value = e.target.value;
     });
 
-    // フォント適用
-    fontSaveBtn.addEventListener('click', () => {
-        const font = fontSelect.value;
-        localStorage.setItem(STORAGE_FONT_KEY, font);
-        applySettings();
-        alert('フォントを切り替えました！');
+    themeColorInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (/^#[0-9A-F]{6}$/i.test(val)) {
+            themeColorPicker.value = val;
+        }
     });
 
-    function applySettings() {
-        const theme = localStorage.getItem(STORAGE_THEME_KEY);
-        const font = localStorage.getItem(STORAGE_FONT_KEY);
+    // 保存処理
+    saveThemeBtn.addEventListener('click', () => {
+        const newTheme = themeColorInput.value;
+        const newFont = fontSelect.value;
 
-        if (theme) {
-            document.documentElement.style.setProperty('--accent-color', theme);
+        if (/^#[0-9A-F]{6}$/i.test(newTheme)) {
+            localStorage.setItem('grow_up_me_theme', newTheme);
+            document.documentElement.style.setProperty('--accent-color', newTheme);
+        } else {
+            alert('正しいカラーコード(#FFFFFF形式)を入力してください。');
+            return;
         }
-        if (font) {
-            document.body.style.fontFamily = font;
-        }
-    }
+
+        localStorage.setItem('grow_up_me_font', newFont);
+        document.body.style.fontFamily = newFont;
+
+        alert('設定を保存しました！');
+    });
 });

@@ -1,24 +1,19 @@
-/* mypage.html 専用スタイル */
-.sub-title {
-    font-size: 13px;
+/* mypage.css */
+
+.setting-item {
+    margin-bottom: 12px;
+}
+
+.setting-item label {
+    display: block;
     margin-bottom: 4px;
-    color: #ffcc00;
+    font-size: 14px;
+    color: var(--accent-color);
 }
 
-.desc-text {
-    font-size: 10px;
-    color: #a0a0c0;
-    margin-bottom: 8px;
-}
-
-.setting-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.primary-btn {
-    background-color: var(--accent-color, #00ffcc);
-    color: #000;
-    width: 100%;
+#theme-color-picker {
+    border: 2px solid #fff;
+    background-color: var(--bg-color);
+    cursor: pointer;
+    padding: 0;
 }

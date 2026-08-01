@@ -2,40 +2,53 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - プロジェクト</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="project.css">
 </head>
 <body>
-    <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">プロジェクト</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
+    <div id="app" class="app-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">プロジェクト</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
 
         <main class="main-content">
-            <!-- 目標追加フォーム -->
             <div class="content-box">
-                <h2 class="sub-title">長期目標を追加</h2>
-                <div class="input-form">
-                    <input type="text" id="project-title" class="dot-input" placeholder="目標名（例: 資格取得する）">
-                    <button id="project-add-btn" class="dot-btn primary-btn">追加する</button>
-                </div>
+                <h2 class="sub-title">長期目標の追加</h2>
+                <input type="text" id="project-title" class="dot-input" placeholder="例：基本情報技術者試験の合格" style="width:100%; margin-bottom:8px;">
+                <button id="add-project-btn" class="dot-btn" style="width: 100%;">追加する</button>
             </div>
 
-            <!-- 目標一覧表示 -->
-            <div class="content-box">
-                <h2 class="sub-title">プロジェクト一覧</h2>
+            <div class="content-box scroll-box">
+                <h2 class="sub-title">進行中のプロジェクト</h2>
                 <ul id="project-list" class="dot-list">
                     <!-- JSで動的生成 -->
                 </ul>

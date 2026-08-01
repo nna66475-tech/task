@@ -1,170 +1,128 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_TASK_KEY = 'grow_up_me_tasks';
+// schedule.js
 
-    const calendarTitleEl = document.getElementById('calendar-title');
-    const calendarGridEl = document.getElementById('calendar-grid');
+document.addEventListener('DOMContentLoaded', () => {
+    const monthDisplay = document.getElementById('month-display');
+    const calendarBody = document.getElementById('calendar-body');
     const prevMonthBtn = document.getElementById('prev-month-btn');
     const nextMonthBtn = document.getElementById('next-month-btn');
-    const selectedDateLabel = document.getElementById('selected-date-label');
-    const dayScheduleListEl = document.getElementById('day-schedule-list');
+    const selectedDayTasksUl = document.getElementById('selected-day-tasks');
 
-    // 現在表示している年・月
     let currentDate = new Date();
-    let currentYear = currentDate.getFullYear();
-    let currentMonth = currentDate.getMonth(); // 0-11
-
-    // 選択中の日付 (初期値は今日)
-    let selectedDateStr = formatDateString(currentDate);
-
-    // タスクデータを取得して自動連携
-    function getTasksAsEvents() {
-        const tasks = JSON.parse(localStorage.getItem(STORAGE_TASK_KEY)) || [];
-        const eventsMap = {};
-
-        tasks.forEach(task => {
-            // 締切日を予定（スケジュール）として自動表示
-            const dueDate = task.dueDate; // 'YYYY-MM-DD'
-            if (!eventsMap[dueDate]) {
-                eventsMap[dueDate] = [];
-            }
-            eventsMap[dueDate].push({
-                title: `[締切] ${task.title}`,
-                type: 'task-due'
-            });
-
-            // 開始日がある場合
-            if (task.startDate && task.startDate !== task.dueDate) {
-                if (!eventsMap[task.startDate]) {
-                    eventsMap[task.startDate] = [];
-                }
-                eventsMap[task.startDate].push({
-                    title: `[開始] ${task.title}`,
-                    type: 'task-start'
-                });
-            }
-        });
-
-        return eventsMap;
+    
+    function getTasks() {
+        return JSON.parse(localStorage.getItem('grow_up_me_tasks')) || [];
     }
 
     function renderCalendar() {
-        calendarGridEl.innerHTML = '';
-        calendarTitleEl.textContent = `${currentYear}年 ${currentMonth + 1}月`;
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        monthDisplay.textContent = `${year}年 ${month + 1}月`;
+        calendarBody.innerHTML = '';
+        selectedDayTasksUl.innerHTML = '<li style="color:#6b6b9c; text-align:center; padding:10px;">日付をタップしてタスクを確認</li>';
 
-        // 当月1日の曜日 (0:日曜〜6:土曜)
-        const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-        // 当月の最終日
-        const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
-        // 前月の最終日
-        const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
-
-        const eventsMap = getTasksAsEvents();
-        const todayStr = formatDateString(new Date());
-
-        let totalCells = 42; // 6週間分 (7 * 6)
-        let dayCount = 1;
-        let nextMonthDayCount = 1;
-
-        for (let i = 0; i < totalCells; i++) {
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const firstDayIndex = firstDay.getDay(); // 0(Sun) - 6(Sat)
+        const totalDays = lastDay.getDate();
+        
+        const prevLastDay = new Date(year, month, 0).getDate();
+        
+        const tasks = getTasks();
+        
+        // カレンダーは42マス(6週)で固定描画
+        for (let i = 0; i < 42; i++) {
             const cell = document.createElement('div');
             cell.className = 'calendar-cell';
-
-            let year = currentYear;
-            let month = currentMonth;
-            let dayNum = 0;
-
+            
+            let cellDate;
+            let isCurrentMonth = false;
+            
             if (i < firstDayIndex) {
-                // 前月分
-                month = currentMonth - 1;
-                dayNum = prevLastDay - firstDayIndex + i + 1;
+                // 前月
                 cell.classList.add('other-month');
-            } else if (dayCount <= lastDay) {
-                // 当月分
-                dayNum = dayCount;
-                dayCount++;
+                const d = prevLastDay - firstDayIndex + i + 1;
+                cellDate = new Date(year, month - 1, d);
+            } else if (i >= firstDayIndex + totalDays) {
+                // 次月
+                cell.classList.add('other-month');
+                const d = i - firstDayIndex - totalDays + 1;
+                cellDate = new Date(year, month + 1, d);
             } else {
-                // 翌月分
-                month = currentMonth + 1;
-                dayNum = nextMonthDayCount;
-                nextMonthDayCount++;
-                cell.classList.add('other-month');
+                // 当月
+                isCurrentMonth = true;
+                const d = i - firstDayIndex + 1;
+                cellDate = new Date(year, month, d);
+                
+                const today = new Date();
+                if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cell.classList.add('today');
+                }
             }
 
-            const cellDate = new Date(year, month, dayNum);
-            const dateStr = formatDateString(cellDate);
+            // 曜日ごとの色付け
+            if (i % 7 === 0) cell.classList.add('sun');
+            if (i % 7 === 6) cell.classList.add('sat');
 
-            if (dateStr === todayStr) {
-                cell.classList.add('today');
-            }
-            if (dateStr === selectedDateStr) {
-                cell.classList.add('selected');
-            }
+            const dateStr = `${cellDate.getFullYear()}-${String(cellDate.getMonth()+1).padStart(2,'0')}-${String(cellDate.getDate()).padStart(2,'0')}`;
 
-            cell.innerHTML = `<span class="cell-date-num">${dayNum}</span>`;
-
-            // イベントが存在すればドットを表示
-            if (eventsMap[dateStr] && eventsMap[dateStr].length > 0) {
-                const dot = document.createElement('div');
-                dot.className = 'cell-event-dot';
-                cell.appendChild(dot);
-            }
-
-            // セルクリックで詳細表示
-            cell.addEventListener('click', () => {
-                selectedDateStr = dateStr;
-                renderCalendar();
-                renderDaySchedule(dateStr, eventsMap[dateStr]);
+            // この日のタスクを取得（startとendの間にあるか判定）
+            const dayTasks = tasks.filter(t => {
+                const start = new Date(t.start);
+                start.setHours(0,0,0,0);
+                const end = new Date(t.end);
+                end.setHours(23,59,59,999);
+                return cellDate >= start && cellDate <= end;
             });
 
-            calendarGridEl.appendChild(cell);
+            let dotsHtml = '';
+            if (dayTasks.length > 0) {
+                // 最大3つまでのドットを表示
+                const dotCount = Math.min(dayTasks.length, 3);
+                for(let j=0; j<dotCount; j++) {
+                    dotsHtml += `<div class="task-dot"></div>`;
+                }
+                if(dayTasks.length > 3) {
+                    dotsHtml += `<div style="font-size:8px; line-height:6px; color:#fff;">+</div>`;
+                }
+            }
+
+            cell.innerHTML = `
+                <div class="cell-date">${cellDate.getDate()}</div>
+                <div class="task-indicator-container">${dotsHtml}</div>
+            `;
+
+            // タップ時の処理
+            cell.addEventListener('click', () => {
+                document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected'));
+                cell.classList.add('selected');
+                
+                selectedDayTasksUl.innerHTML = '';
+                if (dayTasks.length === 0) {
+                    selectedDayTasksUl.innerHTML = '<li style="color:#6b6b9c; text-align:center; padding:10px;">予定なし</li>';
+                } else {
+                    dayTasks.forEach(t => {
+                        const li = document.createElement('li');
+                        li.textContent = `${t.name} (${t.start}〜${t.end})`;
+                        selectedDayTasksUl.appendChild(li);
+                    });
+                }
+            });
+
+            calendarBody.appendChild(cell);
         }
-
-        renderDaySchedule(selectedDateStr, eventsMap[selectedDateStr]);
     }
 
-    function renderDaySchedule(dateStr, events) {
-        selectedDateLabel.textContent = `${dateStr} の予定`;
-        dayScheduleListEl.innerHTML = '';
-
-        if (!events || events.length === 0) {
-            dayScheduleListEl.innerHTML = '<li style="font-size:11px; color:#a0a0c0; text-align:center; padding:6px;">予定はありません</li>';
-            return;
-        }
-
-        events.forEach(ev => {
-            const li = document.createElement('li');
-            li.style.cssText = 'font-size:12px; padding:6px 8px; background-color:#3b3b5c; border:1px solid #6b6b9c; margin-bottom:4px;';
-            li.textContent = ev.title;
-            dayScheduleListEl.appendChild(li);
-        });
-    }
-
-    function formatDateString(dateObj) {
-        const y = dateObj.getFullYear();
-        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const d = String(dateObj.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    }
-
-    // 前月・次月ボタン
     prevMonthBtn.addEventListener('click', () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
+        currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
     });
 
     nextMonthBtn.addEventListener('click', () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
+        currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
     });
 
-    // 初回描画
     renderCalendar();
 });

@@ -2,49 +2,88 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - カスタム</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="custom.css">
 </head>
 <body>
-    <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">カスタム・追加機能</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
+    <div id="app" class="app-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">カスタム</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
+        </div>
 
         <main class="main-content">
-            <!-- 設定一覧表示 -->
             <div class="content-box">
-                <h2 class="sub-title">設定一覧</h2>
-                <ul id="settings-list" class="dot-list">
-                    <li class="setting-item">
-                        <span class="setting-name">テーマカラー設定</span>
-                        <a href="mypage.html" class="dot-btn setting-link-btn">変更する</a>
-                    </li>
-                    <li class="setting-item">
-                        <span class="setting-name">フォント切り替え</span>
-                        <a href="mypage.html" class="dot-btn setting-link-btn">変更する</a>
-                    </li>
-                    <li class="setting-item">
-                        <span class="setting-name">データバックアップ</span>
-                        <span class="setting-badge">準備中</span>
-                    </li>
-                    <li class="setting-item">
-                        <span class="setting-name">通知設定</span>
-                        <span class="setting-badge">準備中</span>
-                    </li>
-                </ul>
+                <h2 class="sub-title">システム設定</h2>
+                
+                <div class="setting-item toggle-item">
+                    <span>BGM</span>
+                    <label class="switch">
+                        <input type="checkbox" id="bgm-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item toggle-item">
+                    <span>SE (効果音)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="se-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item toggle-item">
+                    <span>ローディング演出</span>
+                    <label class="switch">
+                        <input type="checkbox" id="loading-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <label>アニメーション速度</label>
+                    <select id="anim-speed-select" class="dot-input" style="width:100%;">
+                        <option value="normal">標準</option>
+                        <option value="fast">速い</option>
+                        <option value="slow">遅い</option>
+                    </select>
+                </div>
+
+                <button id="save-custom-btn" class="dot-btn" style="width:100%; margin-top:12px;">設定を保存</button>
+            </div>
+
+            <div class="content-box" style="border-color: #ff3366;">
+                <h2 class="sub-title" style="color:#ff3366;">危険な操作</h2>
+                <p style="font-size:12px; margin-bottom:12px;">※すべてのデータ（好感度、家具、記録）が消去されます。元には戻せません。</p>
+                <button id="reset-data-btn" class="dot-btn" style="width:100%; background-color:#ff3366;">データを初期化</button>
             </div>
         </main>
     </div>

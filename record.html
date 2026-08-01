@@ -2,67 +2,76 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grow Up Me! - 記録</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="record.css">
 </head>
 <body>
-    <!-- ローディング画面 -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen hidden">
+        <img src="aruku.gif" id="loading-aruku" class="loading-aruku hidden" alt="aruku">
         <div class="loading-content">
             <p class="loading-title">今日は何する？</p>
-            <div class="loading-bar-container"><div id="loading-bar" class="loading-bar"></div></div>
+            <div class="loading-bar-container">
+                <div id="loading-bar" class="loading-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div id="app" class="app-container hidden">
-        <header class="header">
-            <h1 class="game-title">記録一覧</h1>
-            <a href="index.html" class="back-link">＜ ホームへ戻る</a>
-        </header>
-
-        <!-- 月切り替え部 -->
-        <div class="month-selector-box">
-            <button id="prev-month-btn" class="dot-btn">&lt; 前月</button>
-            <span id="month-title" class="calendar-title">2026年 7月</span>
-            <button id="next-month-btn" class="dot-btn">次月 &gt;</button>
+    <div id="app" class="app-container">
+        <!-- ページ共通ナビゲーションメニュー -->
+        <div class="top-nav">
+            <a href="index.html" class="nav-home-btn">🏠</a>
+            <span class="nav-title">記録</span>
+            <button id="nav-toggle-btn" class="nav-btn">≡</button>
+        </div>
+        
+        <div id="global-menu" class="global-menu hidden">
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+            <ul class="menu-list">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="room.html">マイルーム</a></li>
+                <li><a href="task.html">タスク一覧・締切</a></li>
+                <li><a href="input.html">インプット</a></li>
+                <li><a href="record.html">記録</a></li>
+                <li><a href="project.html">プロジェクト</a></li>
+                <li><a href="mypage.html">マイページ</a></li>
+                <li><a href="custom.html">カスタム</a></li>
+            </ul>
         </div>
 
-        <!-- タブ切り替え -->
+        <div class="month-selector">
+            <button id="prev-month-btn" class="calendar-nav-btn">◀</button>
+            <h2 id="month-display" class="sub-title" style="margin:0;">2026年 8月</h2>
+            <button id="next-month-btn" class="calendar-nav-btn">▶</button>
+        </div>
+
         <div class="tab-container">
-            <button class="dot-btn tab-btn active" data-target="tab-daily">今日やったこと</button>
-            <button class="dot-btn tab-btn" data-target="tab-tasks">完了タスク</button>
-            <button class="dot-btn tab-btn" data-target="tab-watched">見た作品</button>
+            <button class="dot-btn tab-btn active" data-target="tab-report">日常報告</button>
+            <button class="dot-btn tab-btn" data-target="tab-task">タスク</button>
+            <button class="dot-btn tab-btn" data-target="tab-input">インプット</button>
         </div>
 
         <main class="main-content">
-            <!-- 【今日やったことタブ】 -->
-            <section id="tab-daily" class="tab-content">
-                <div class="content-box">
-                    <h2 class="sub-title">1日ごとの記録</h2>
-                    <ul id="daily-list" class="dot-list">
+            <section id="tab-report" class="tab-content">
+                <div class="content-box scroll-box">
+                    <ul id="report-list" class="dot-list record-list">
                         <!-- JSで動的生成 -->
                     </ul>
                 </div>
             </section>
 
-            <!-- 【完了タスクタブ】 -->
-            <section id="tab-tasks" class="tab-content hidden">
-                <div class="content-box">
-                    <h2 class="sub-title">完了したタスク一覧</h2>
-                    <ul id="tasks-list" class="dot-list">
+            <section id="tab-task" class="tab-content hidden">
+                <div class="content-box scroll-box">
+                    <ul id="task-list" class="dot-list record-list">
                         <!-- JSで動的生成 -->
                     </ul>
                 </div>
             </section>
 
-            <!-- 【見た作品タブ】 -->
-            <section id="tab-watched" class="tab-content hidden">
-                <div class="content-box">
-                    <h2 class="sub-title">見た作品・インプット一覧</h2>
-                    <ul id="watched-list" class="dot-list">
+            <section id="tab-input" class="tab-content hidden">
+                <div class="content-box scroll-box">
+                    <ul id="input-list" class="dot-list record-list">
                         <!-- JSで動的生成 -->
                     </ul>
                 </div>
