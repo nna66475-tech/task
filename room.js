@@ -180,20 +180,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 部屋機能 ---
     const STORAGE_ROOM_KEY = 'grow_up_me_room';
+
+    // データ構造にx, yを追加（既存データとの互換性を維持）
+    const defaultFurnitures = [
+        { id: 1, name: 'サボテン', placed: false, emoji: '🌵', x: 10, y: 20 },
+        { id: 2, name: 'ソファ', placed: false, emoji: '🛋️', x: 40, y: 30 },
+        { id: 3, name: 'ベッド', placed: false, emoji: '🛏️', x: 70, y: 20 },
+        { id: 4, name: '本棚', placed: false, emoji: '📚', x: 20, y: 60 },
+        { id: 5, name: 'テレビ', placed: false, emoji: '📺', x: 50, y: 10 },
+        { id: 6, name: 'パソコン', placed: false, emoji: '💻', x: 60, y: 50 },
+        { id: 7, name: '観葉植物', placed: false, emoji: '🪴', x: 30, y: 70 },
+        { id: 8, name: 'ゲーム機', placed: false, emoji: '🎮', x: 80, y: 60 }
+    ];
+
     let roomData = JSON.parse(localStorage.getItem(STORAGE_ROOM_KEY)) || {
         level: 1,
         lastReportDate: null,
-        furnitures: [
-            { id: 1, name: 'サボテン', placed: false, emoji: '🌵' },
-            { id: 2, name: 'ソファ', placed: false, emoji: '🛋️' },
-            { id: 3, name: 'ベッド', placed: false, emoji: '🛏️' },
-            { id: 4, name: '本棚', placed: false, emoji: '📚' },
-            { id: 5, name: 'テレビ', placed: false, emoji: '📺' },
-            { id: 6, name: 'パソコン', placed: false, emoji: '💻' },
-            { id: 7, name: '観葉植物', placed: false, emoji: '🪴' },
-            { id: 8, name: 'ゲーム機', placed: false, emoji: '🎮' }
-        ]
+        furnitures: defaultFurnitures
     };
+
+    // 既存データにx,yがない場合は補完する
+    roomData.furnitures.forEach((item, i) => {
+        if (item.x === undefined) item.x = defaultFurnitures[i] ? defaultFurnitures[i].x : (i * 30 + 10) % 80;
+        if (item.y === undefined) item.y = defaultFurnitures[i] ? defaultFurnitures[i].y : (i * 20 + 20) % 70;
+    });
+    localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
 
     const roomLevelEl = document.getElementById('room-level');
     const furnitureListEl = document.getElementById('furniture-list');
@@ -212,17 +223,99 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- ドラッグ＆ドロップ処理 ---
+    let dragTarget = null;   // ドラッグ中の家具DOM要素
+    let dragItemId = null;   // ドラッグ中の家具ID
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function getPointerPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function onDragStart(e) {
+        e.preventDefault();
+        const el = e.currentTarget;
+        dragTarget = el;
+        dragItemId = parseInt(el.getAttribute('data-furniture-id'));
+
+        const rect = roomView.getBoundingClientRect();
+        const pos = getPointerPos(e);
+        dragOffsetX = pos.x - el.getBoundingClientRect().left;
+        dragOffsetY = pos.y - el.getBoundingClientRect().top;
+
+        el.style.zIndex = '100';
+        el.classList.add('dragging');
+    }
+
+    function onDragMove(e) {
+        if (!dragTarget) return;
+        e.preventDefault();
+
+        const pos = getPointerPos(e);
+        const rect = roomView.getBoundingClientRect();
+
+        // roomView内でのパーセンテージ座標を計算
+        let newX = ((pos.x - dragOffsetX - rect.left) / rect.width) * 100;
+        let newY = ((pos.y - dragOffsetY - rect.top) / rect.height) * 100;
+
+        // 範囲制限（0〜90%程度に収める）
+        newX = Math.max(0, Math.min(90, newX));
+        newY = Math.max(0, Math.min(85, newY));
+
+        dragTarget.style.left = newX + '%';
+        dragTarget.style.top = newY + '%';
+    }
+
+    function onDragEnd(e) {
+        if (!dragTarget) return;
+
+        const rect = roomView.getBoundingClientRect();
+        const elRect = dragTarget.getBoundingClientRect();
+
+        // 最終位置をパーセンテージで保存
+        let finalX = ((elRect.left - rect.left) / rect.width) * 100;
+        let finalY = ((elRect.top - rect.top) / rect.height) * 100;
+        finalX = Math.max(0, Math.min(90, finalX));
+        finalY = Math.max(0, Math.min(85, finalY));
+
+        // roomDataに保存
+        const item = roomData.furnitures.find(f => f.id === dragItemId);
+        if (item) {
+            item.x = Math.round(finalX);
+            item.y = Math.round(finalY);
+            localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(roomData));
+        }
+
+        dragTarget.style.zIndex = '10';
+        dragTarget.classList.remove('dragging');
+        dragTarget = null;
+        dragItemId = null;
+    }
+
+    // グローバルにmove/endイベントを登録（roomViewの外にドラッグしても追従する）
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', onDragEnd);
+
+    // --- 描画 ---
     function renderRoom() {
         roomLevelEl.textContent = roomData.level;
         furnitureListEl.innerHTML = '';
 
         const availableItems = Math.min(roomData.furnitures.length, Math.ceil(roomData.level / 3) + 1);
 
+        // 既存の家具要素を全削除
         document.querySelectorAll('.furniture-item-placed').forEach(e => e.remove());
 
         for (let i = 0; i < availableItems; i++) {
             const item = roomData.furnitures[i];
             
+            // --- 家具リスト（設置/収納ボタン） ---
             const li = document.createElement('li');
             li.innerHTML = `
                 <div class="furniture-info">
@@ -234,16 +327,28 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             furnitureListEl.appendChild(li);
 
+            // --- 部屋ビューに家具を配置（placedのもののみ） ---
             if (item.placed) {
                 const f = document.createElement('div');
                 f.className = 'furniture-item-placed';
                 f.textContent = item.emoji;
-                f.style.left = `${(i * 30 + 10) % 80}%`;
-                f.style.top = `${(i * 20 + 20) % 70}%`;
+                f.setAttribute('data-furniture-id', item.id);
+                f.style.left = item.x + '%';
+                f.style.top = item.y + '%';
+                f.style.position = 'absolute';
+                f.style.cursor = 'grab';
+                f.style.userSelect = 'none';
+                f.style.touchAction = 'none'; // タッチスクロール抑制
+
+                // ドラッグイベント登録
+                f.addEventListener('mousedown', onDragStart);
+                f.addEventListener('touchstart', onDragStart, { passive: false });
+
                 roomView.appendChild(f);
             }
         }
 
+        // 設置/収納ボタンのイベント
         document.querySelectorAll('.furniture-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
@@ -259,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         arukuChar.classList.remove('hidden');
     }
 
+    // arukuキャラの自動移動
     setInterval(() => {
         if (!arukuChar.classList.contains('hidden')) {
             const x = Math.floor(Math.random() * 80);
